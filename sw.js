@@ -1,6 +1,6 @@
 // UBAH ANGKA VERSI INI SETIAP KALI KAMU MENGUBAH KODE INDEX.HTML
 // Contoh: v1, v2, v3, v3.1, dst.
-const CACHE_NAME = 'buku-tamu-v1'; 
+const CACHE_NAME = 'buku-tamu-v2'; 
 
 const urlsToCache = [
   './',
