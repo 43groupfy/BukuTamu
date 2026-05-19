@@ -1,4 +1,4 @@
-const CACHE_NAME = 'buku-tamu-v1';
+const CACHE_NAME = 'buku-tamu-v2';
 const urlsToCache = [
   './',
   './index.html',
