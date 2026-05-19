@@ -190,6 +190,20 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+		
+		/* Container untuk tombol Simpan & Ulang Foto */
+		.action-buttons {
+		    display: flex;
+		    gap: 10px;
+		    margin-top: 15px;
+		}
+		
+		/* Mengubah susunan jika diakses dari layar HP (lebar maksimal 480px) */
+		@media (max-width: 480px) {
+		    .action-buttons {
+		        flex-direction: column; /* Menyusun dari atas ke bawah */
+		    }
+		}
     </style>
 </head>
 <body>
@@ -213,12 +227,18 @@
         <div class="form-group">
             <label>Ambil Foto Wajah</label>
             <div class="camera-container"><video id="camera-feed" autoplay playsinline></video></div>
-            <div class="camera-controls">
-                <button class="btn-secondary" style="flex: 1;" onclick="toggleCamera()">🔄 Balik Kamera</button>
-                <button class="btn-primary" style="flex: 2;" onclick="takePhoto()">📸 Jepret HD</button>
-            </div>
-            <canvas id="canvas" style="display: none;"></canvas>
-            <img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
+			<div class="camera-controls" id="camera-controls">
+			    <button class="btn-secondary" style="flex: 1;" onclick="toggleCamera()">🔄 Balik Kamera</button>
+			    <button class="btn-primary" style="flex: 2;" onclick="takePhoto()">📸 Jepret HD</button>
+			</div>
+			<canvas id="canvas" style="display: none;"></canvas>
+			<img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
+			
+			<!-- Tombol Aksi Baru -->
+			<div class="action-buttons">
+			    <button id="btn-retake" class="btn-secondary" style="display: none; flex: 1;" onclick="retakePhoto()">🔄 Ulang Foto</button>
+			    <button id="btn-submit" class="btn-primary" style="flex: 2;" onclick="submitGuest()">Simpan Data</button>
+			</div>
         </div>
         <button class="btn-primary" style="padding: 16px; margin-top: 10px;" onclick="submitGuest()">Simpan Data</button>
     </div>
@@ -353,7 +373,23 @@
         
         capturedImage = canvas.toDataURL('image/jpeg', 0.95); 
         preview.src = capturedImage; preview.style.display = 'block'; video.style.display = 'none'; 
-    }
+
+	    // TAMBAHKAN DUA BARIS INI: Sembunyikan tombol jepret, tampilkan tombol ulang
+	    document.getElementById('camera-controls').style.display = 'none';
+	    document.getElementById('btn-retake').style.display = 'block';
+	}
+
+	function retakePhoto() {
+	    capturedImage = null; // Hapus data foto lama
+	    
+	    // Sembunyikan hasil foto dan tombol ulang
+	    document.getElementById('photo-preview').style.display = 'none';
+	    document.getElementById('btn-retake').style.display = 'none';
+	    
+	    // Tampilkan kembali kamera live dan tombol jepret
+	    document.getElementById('camera-feed').style.display = 'block';
+	    document.getElementById('camera-controls').style.display = 'flex';
+	}
 
     async function submitGuest() {
         const name = document.getElementById('guest-name').value;
@@ -375,7 +411,10 @@
             if (result.status === 'success') {
                 document.getElementById('guest-name').value = ''; document.getElementById('guest-institution').value = '';
                 document.getElementById('guest-purpose').value = ''; capturedImage = null;
-                document.getElementById('photo-preview').style.display = 'none'; document.getElementById('camera-feed').style.display = 'block';
+                document.getElementById('photo-preview').style.display = 'none'; 
+				document.getElementById('camera-feed').style.display = 'block';
+				document.getElementById('btn-retake').style.display = 'none';
+				document.getElementById('camera-controls').style.display = 'flex';
                 navigate('success');
             } else alert("Gagal menyimpan data: " + result.message);
         } catch (e) { alert("Terjadi kesalahan koneksi server. Pastikan internet menyala."); } 
