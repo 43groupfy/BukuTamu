@@ -9,8 +9,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="icon.svg">
-	<link rel="icon" type="image/x-icon" href="icon.svg">
-
+    <link rel="icon" type="image/x-icon" href="icon.svg">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,26 +23,22 @@
             --border: #e2e8f0;
             --success: #10b981;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
         }
-
         body {
             background-color: var(--bg);
             color: var(--text);
             line-height: 1.5;
         }
-
         .container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px 15px;
         }
-
         .view-section {
             display: none;
             background: var(--surface);
@@ -50,12 +46,10 @@
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
         .view-section.active {
             display: block;
             animation: fadeIn 0.3s ease-in-out;
         }
-
         .btn-back {
             background: transparent;
             color: var(--text-light);
@@ -69,17 +63,14 @@
             align-items: center;
             gap: 5px;
         }
-
         .btn-back:hover { color: var(--primary); }
         .form-group { margin-bottom: 15px; }
-
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
             font-size: 0.9rem;
         }
-
         input[type="text"], input[type="date"], select {
             width: 100%;
             padding: 12px;
@@ -89,7 +80,6 @@
             background: var(--bg);
             font-family: inherit;
         }
-
         .camera-container {
             position: relative;
             width: 100%;
@@ -98,16 +88,13 @@
             background: #000;
             margin-bottom: 10px;
         }
-
         #camera-feed {
             width: 100%;
             display: block;
             object-fit: cover; 
         }
-
         .mirrored { transform: scaleX(-1); }
         .camera-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-
         button {
             padding: 12px 16px;
             border: none;
@@ -117,17 +104,14 @@
             font-size: 1rem;
             transition: all 0.2s;
         }
-
         .btn-primary {
             background: var(--primary);
             color: white;
             width: 100%;
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
-
         .btn-primary:active { transform: scale(0.98); }
         .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); width: 100%; }
-
         #photo-preview {
             width: 100%;
             border-radius: 8px;
@@ -136,7 +120,6 @@
             cursor: zoom-in;
             border: 2px solid var(--border);
         }
-
         .filter-card {
             background: var(--bg);
             border: 1px solid var(--border);
@@ -144,10 +127,8 @@
             padding: 12px;
             margin-bottom: 20px;
         }
-
         .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; display: none; }
         .date-grid label { font-size: 0.8rem; color: var(--text-light); }
-
         .guest-card {
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -158,7 +139,6 @@
             align-items: center;
             background: var(--surface);
         }
-
         .guest-photo {
             width: 65px;
             height: 65px;
@@ -168,80 +148,70 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
-
         .guest-info { flex: 1; min-width: 0; }
         .guest-info h4 { margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .inst-text { font-weight: 400; font-size: 0.85rem; color: var(--text-light); }
         .guest-info p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .badge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-
         .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 99px; background: #fef3c7; color: #d97706; font-weight: 600; }
         .status-badge.pulang { background: #d1fae5; color: #059669; }
         .btn-pulang { background: var(--success); color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 6px; }
-
         .lightbox {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px;
         }
         .lightbox.active { display: flex; animation: fadeIn 0.2s ease-in-out; }
         .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); cursor: zoom-out; }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-		
-		/* Container untuk tombol Simpan & Ulang Foto */
-		.action-buttons {
-		    display: flex;
-		    gap: 10px;
-		    margin-top: 15px;
-		}
-		
-		/* Mengubah susunan jika diakses dari layar HP (lebar maksimal 480px) */
-		@media (max-width: 480px) {
-		    .action-buttons {
-		        flex-direction: column; /* Menyusun dari atas ke bawah */
-		    }
-		}
     </style>
 </head>
 <body>
-
 <div class="container">
-
+    
+    <!-- BERANDA -->
     <div id="view-home" class="view-section active" style="text-align: center; padding: 40px 20px;">
         <h1 style="margin-bottom: 5px; color: var(--text); font-size: 1.8rem;">Buku Tamu Digital</h1>
         <p style="color: var(--text-light); margin-bottom: 40px; font-size: 0.9rem;">Pilih menu layanan di bawah ini</p>
-        
         <button class="btn-primary" style="padding: 18px; margin-bottom: 15px; font-size: 1.1rem;" onclick="navigate('tamu')">✍️ Isi Form Tamu</button>
         <button class="btn-secondary" style="padding: 18px; font-size: 1.1rem;" onclick="navigate('satpam')">👮 Buka Buku Tamu</button>
     </div>
 
+    <!-- FORM TAMU -->
     <div id="view-tamu" class="view-section">
         <button class="btn-back" onclick="navigate('home')">⬅ Kembali ke Beranda</button>
         <h2 style="margin-bottom: 20px;">Registrasi Tamu</h2>
+        
         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="guest-name" placeholder="Masukkan nama..." required></div>
         <div class="form-group"><label>Asal Instansi</label><input type="text" id="guest-institution" placeholder="Contoh: Masyarakat Umum / PT. Maju Jalan ..." required></div>
         <div class="form-group"><label>Tujuan / Keperluan</label><input type="text" id="guest-purpose" placeholder="Bertemu siapa / untuk apa..." required></div>
+        
         <div class="form-group">
-            <label>Ambil Foto Wajah</label>
+            <label>Foto Wajah</label>
             <div class="camera-container"><video id="camera-feed" autoplay playsinline></video></div>
-			<div class="camera-controls" id="camera-controls">
-			    <button class="btn-secondary" style="flex: 1;" onclick="toggleCamera()">🔄 Balik Kamera</button>
-			    <button class="btn-primary" style="flex: 2;" onclick="takePhoto()">📸 Jepret HD</button>
-			</div>
-			<canvas id="canvas" style="display: none;"></canvas>
-			<img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
-			
-			<!-- Tombol Aksi Baru -->
-			<div class="action-buttons">
-			    <button id="btn-retake" class="btn-secondary" style="display: none; flex: 1;" onclick="retakePhoto()">🔄 Ulang Foto</button>
-			    <button id="btn-submit" class="btn-primary" style="flex: 2;" onclick="submitGuest()">Simpan Data</button>
-			</div>
+            <canvas id="canvas" style="display: none;"></canvas>
+            <img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
+            
+            <!-- Kontrol Saat Kamera Aktif -->
+            <div class="camera-controls" id="camera-controls">
+                <button class="btn-secondary" style="flex: 1;" onclick="toggleCamera()">🔄 Balik</button>
+                <button class="btn-primary" style="flex: 2;" onclick="takePhoto()">Ambil Foto</button>
+            </div>
+            
+            <!-- Kontrol Saat Foto Sudah Diambil -->
+            <div id="retake-controls" style="display: none; margin-bottom: 15px;">
+                <button class="btn-secondary" style="width: 100%;" onclick="retakePhoto()">Ulang Foto</button>
+            </div>
         </div>
-	</div>
 
+        <!-- Tombol Submit Utama di Paling Bawah -->
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0 15px 0;">
+        <button id="btn-submit" class="btn-primary" style="padding: 16px; font-size: 1.05rem;" onclick="submitGuest()">Submit Data</button>
+    </div>
+
+    <!-- SUKSES -->
     <div id="view-success" class="view-section" style="text-align: center; padding: 50px 20px;">
         <div style="font-size: 5rem; margin-bottom: 15px;">✅</div>
         <h2 style="color: var(--text); margin-bottom: 10px;">Pengisian Berhasil!</h2>
@@ -249,6 +219,7 @@
         <button class="btn-secondary" style="padding: 15px;" onclick="navigate('home')">Tutup & Kembali</button>
     </div>
 
+    <!-- DASHBOARD SATPAM -->
     <div id="view-satpam" class="view-section">
         <button class="btn-back" onclick="navigate('home')">⬅ Kembali ke Beranda</button>
         <h2 style="margin-bottom: 15px;">Daftar Tamu</h2>
@@ -267,7 +238,6 @@
         </div>
         <div id="guest-list"></div>
     </div>
-
 </div>
 
 <div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt="Foto Diperbesar" onclick="event.stopPropagation(); closeLightbox();"></div>
@@ -286,13 +256,18 @@
             const pin = prompt("Masukkan PIN Satpam:");
             if (pin !== "3517") { alert("PIN Salah! Akses ditolak."); return; }
         }
-
         document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
         document.getElementById(`view-${viewId}`).classList.add('active');
-
-        if (viewId === 'tamu') startCamera();
-        else if (viewId === 'satpam') { stopCamera(); document.getElementById('time-filter').value = 'all'; loadDataFromDatabase(); }
-        else if (viewId === 'home' || viewId === 'success') stopCamera();
+        
+        if (viewId === 'tamu') {
+            startCamera();
+        } else if (viewId === 'satpam') { 
+            stopCamera(); 
+            document.getElementById('time-filter').value = 'all'; 
+            loadDataFromDatabase(); 
+        } else if (viewId === 'home' || viewId === 'success') {
+            stopCamera();
+        }
     }
 
     function handleFilterChange() {
@@ -307,7 +282,6 @@
         const now = new Date();
         let filteredGuests = guests;
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
         if (filterType === 'today') filteredGuests = guests.filter(g => g.id >= todayStart);
         else if (filterType === 'week') filteredGuests = guests.filter(g => g.id >= todayStart - (6 * 24 * 60 * 60 * 1000));
         else if (filterType === 'custom') {
@@ -355,69 +329,83 @@
         context.imageSmoothingEnabled = true; context.imageSmoothingQuality = 'high';
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         if (useFrontCamera) context.setTransform(1, 0, 0, 1, 0, 0); 
-
+        
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const timestampText = now.toLocaleDateString('id-ID', options).replace(/\./g, ':');
-
         context.font = "500 24px Inter, sans-serif";
         const textWidth = context.measureText(timestampText).width;
         const padX = 18, padY = 12, boxH = 46;
         const startX = canvas.width - textWidth - (padX * 2) - 20; 
         const startY = canvas.height - boxH - 20; 
-
         context.fillStyle = "rgba(15, 23, 42, 0.7)"; 
         context.beginPath(); context.roundRect(startX, startY, textWidth + (padX * 2), boxH, 8); context.fill();
         context.fillStyle = "#ffffff"; context.textBaseline = "middle"; context.fillText(timestampText, startX + padX, startY + (boxH / 2));
         
         capturedImage = canvas.toDataURL('image/jpeg', 0.95); 
-        preview.src = capturedImage; preview.style.display = 'block'; video.style.display = 'none'; 
+        preview.src = capturedImage; 
+        preview.style.display = 'block'; 
+        video.style.display = 'none'; 
+        
+        // Transisi Tombol Kamera
+        document.getElementById('camera-controls').style.display = 'none';
+        document.getElementById('retake-controls').style.display = 'block';
+    }
 
-	    // TAMBAHKAN DUA BARIS INI: Sembunyikan tombol jepret, tampilkan tombol ulang
-	    document.getElementById('camera-controls').style.display = 'none';
-	    document.getElementById('btn-retake').style.display = 'block';
-	}
-
-	function retakePhoto() {
-	    capturedImage = null; // Hapus data foto lama
-	    
-	    // Sembunyikan hasil foto dan tombol ulang
-	    document.getElementById('photo-preview').style.display = 'none';
-	    document.getElementById('btn-retake').style.display = 'none';
-	    
-	    // Tampilkan kembali kamera live dan tombol jepret
-	    document.getElementById('camera-feed').style.display = 'block';
-	    document.getElementById('camera-controls').style.display = 'flex';
-	}
+    function retakePhoto() {
+        capturedImage = null; 
+        document.getElementById('photo-preview').style.display = 'none';
+        document.getElementById('retake-controls').style.display = 'none';
+        
+        document.getElementById('camera-feed').style.display = 'block';
+        document.getElementById('camera-controls').style.display = 'flex';
+    }
 
     async function submitGuest() {
         const name = document.getElementById('guest-name').value;
         const inst = document.getElementById('guest-institution').value;
         const purpose = document.getElementById('guest-purpose').value;
-        const submitBtn = document.querySelector('button[onclick="submitGuest()"]');
+        const submitBtn = document.getElementById('btn-submit');
 
-        if (!name || !inst || !purpose || !capturedImage) return alert("Mohon lengkapi semua data dan jepret foto wajah Anda!");
+        if (!name || !inst || !purpose || !capturedImage) {
+            return alert("Mohon lengkapi semua data dan ambil foto sebelum melakukan Submit!");
+        }
 
         const newGuest = { action: 'addGuest', id: Date.now(), name: name, institution: inst, purpose: purpose, photo: capturedImage };
-
-        submitBtn.innerText = "⏳ Sedang Menyimpan..."; submitBtn.disabled = true; submitBtn.style.opacity = '0.7';
+        submitBtn.innerText = "⏳ Sedang Submit..."; 
+        submitBtn.disabled = true; 
+        submitBtn.style.opacity = '0.7';
 
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST', body: JSON.stringify(newGuest), headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
             });
             const result = await response.json();
+            
             if (result.status === 'success') {
-                document.getElementById('guest-name').value = ''; document.getElementById('guest-institution').value = '';
-                document.getElementById('guest-purpose').value = ''; capturedImage = null;
+                // Reset Form
+                document.getElementById('guest-name').value = ''; 
+                document.getElementById('guest-institution').value = '';
+                document.getElementById('guest-purpose').value = ''; 
+                capturedImage = null;
                 document.getElementById('photo-preview').style.display = 'none'; 
-				document.getElementById('camera-feed').style.display = 'block';
-				document.getElementById('btn-retake').style.display = 'none';
-				document.getElementById('camera-controls').style.display = 'flex';
+                document.getElementById('camera-feed').style.display = 'block';
+                
+                // Reset Tombol Kamera
+                document.getElementById('retake-controls').style.display = 'none';
+                document.getElementById('camera-controls').style.display = 'flex';
+                
                 navigate('success');
-            } else alert("Gagal menyimpan data: " + result.message);
-        } catch (e) { alert("Terjadi kesalahan koneksi server. Pastikan internet menyala."); } 
-        finally { submitBtn.innerText = "Simpan Data"; submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
+            } else {
+                alert("Gagal menyimpan data: " + result.message);
+            }
+        } catch (e) { 
+            alert("Terjadi kesalahan koneksi server. Pastikan internet menyala."); 
+        } finally { 
+            submitBtn.innerText = "🚀 Submit Data"; 
+            submitBtn.disabled = false; 
+            submitBtn.style.opacity = '1'; 
+        }
     }
 
     async function loadDataFromDatabase() {
@@ -433,14 +421,13 @@
         const container = document.getElementById('guest-list');
         container.innerHTML = '';
         if (dataToRender.length === 0) return container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:20px;">Tidak ada data tamu di periode ini.</p>';
-
+        
         const sortedGuests = [...dataToRender].sort((a, b) => b.id - a.id);
         sortedGuests.forEach(guest => {
             const card = document.createElement('div'); card.className = 'guest-card';
             const isPulang = guest.status === 'Pulang';
             const badgeClass = isPulang ? 'status-badge pulang' : 'status-badge';
             const instDisplay = guest.institution ? guest.institution : '-';
-            
             card.innerHTML = `
                 <img src="${guest.photo}" class="guest-photo" alt="Foto" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/65x65?text=No+Img'">
                 <div class="guest-info">
@@ -472,7 +459,6 @@
 
     window.onload = function() { navigate('home'); };
 
-    // --- REGISTRASI PWA SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
@@ -481,6 +467,5 @@
       });
     }
 </script>
-
 </body>
 </html>
