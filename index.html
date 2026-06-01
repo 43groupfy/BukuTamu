@@ -78,7 +78,7 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 .btn-secondary:active { background: #cbd5e1; }
 
 .photo-placeholder { width: 100%; aspect-ratio: 16/9; background: #F1F5F9; border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-bottom: 16px; overflow: hidden; }
-#photo-preview { width: 100%; height: 100%; object-fit: cover; display: none; cursor: zoom-in; }
+#photo-preview { width: 100%; height: 100%; object-fit: contain; /* diubah ke contain agar tidak terpotong di form */ display: none; cursor: zoom-in; background: #000; }
 
 /* ========================================= */
 /* UI KAMERA FULLSCREEN (POP-UP) ABSOLUTE    */
@@ -97,9 +97,8 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 /* Overlay UI di atas Video */
 .camera-ui {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 2010; pointer-events: none; /* Klik tembus ke belakang */
+    z-index: 2010; pointer-events: none;
 }
-/* Kembalikan fungsi klik khusus untuk tombol */
 .camera-ui button { pointer-events: auto; }
 
 /* 1. Tombol Capture: Bawah & Tengah Horizontal */
@@ -117,17 +116,12 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 /* 2. Watermark Live: Kiri Layar, Rotasi -90deg, Text-Align Right */
 #live-watermark {
     position: absolute;
-    left: 55px; /* Jarak dari kiri fisik layar */
-    top: 50%;   /* Mulai dari tengah vertikal */
-    
-    /* Putar -90 derajat (atas huruf menghadap kanan) dan dorong elemen 
-       sepanjang sumbu barunya agar benar-benar berada di tengah */
+    left: 55px; 
+    top: 50%;   
     transform-origin: top left;
     transform: rotate(-270deg) translateX(-50%);
-    
-    width: 370px; /* Lebar box teks */
-    text-align: right; /* Meratakan teks ke "kanan" (berarti ke atas fisik layar) */
-    
+    width: 370px; 
+    text-align: right; 
     background: rgba(15, 23, 42, 0.75);
     color: white;
     padding: 8px 16px;
@@ -148,18 +142,10 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 .icon-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
 
 /* 3. Tombol Ganti Kamera: Kanan Bawah */
-.btn-switch {
-    position: absolute;
-    bottom: 45px;
-    right: 25px;
-}
+.btn-switch { position: absolute; bottom: 45px; right: 25px; }
 
 /* 4. Tombol Close: Kanan Atas */
-.btn-close {
-    position: absolute;
-    top: 35px;
-    right: 25px;
-}
+.btn-close { position: absolute; top: 35px; right: 25px; }
 /* ========================================= */
 
 
@@ -377,30 +363,52 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
         const placeholderIcon = document.getElementById('empty-photo-icon');
         
         const context = canvas.getContext('2d');
-        const targetWidth = 1280; const targetHeight = 720;
-        canvas.width = targetWidth; canvas.height = targetHeight;
+        
+        // Ambil dimensi asli video, JANGAN di-crop
+        const videoWidth = video.videoWidth; 
+        const videoHeight = video.videoHeight;
+        const isPortrait = videoHeight > videoWidth;
 
-        const videoWidth = video.videoWidth; const videoHeight = video.videoHeight;
-        const videoAspectRatio = videoWidth / videoHeight; const targetAspectRatio = targetWidth / targetHeight;
-        let sourceX, sourceY, sourceWidth, sourceHeight;
+        let targetWidth, targetHeight;
 
-        // Logika center crop agar hasil foto selalu Landscape 16:9
-        if (videoAspectRatio > targetAspectRatio) {
-            sourceHeight = videoHeight; sourceWidth = videoHeight * targetAspectRatio;
-            sourceX = (videoWidth - sourceWidth) / 2; sourceY = 0;
+        // Paksa hasil akhir selalu Lanskap 
+        if (isPortrait) {
+            targetWidth = videoHeight;
+            targetHeight = videoWidth;
         } else {
-            sourceWidth = videoWidth; sourceHeight = videoWidth / targetAspectRatio;
-            sourceX = 0; sourceY = (videoHeight - sourceHeight) / 2;
+            targetWidth = videoWidth;
+            targetHeight = videoHeight;
         }
 
-        context.imageSmoothingEnabled = true; context.imageSmoothingQuality = 'high';
-        if (useFrontCamera) { context.translate(targetWidth, 0); context.scale(-1, 1); }
-        context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
-        if (useFrontCamera) context.setTransform(1, 0, 0, 1, 0, 0); 
+        canvas.width = targetWidth; 
+        canvas.height = targetHeight;
+
+        context.imageSmoothingEnabled = true; 
+        context.imageSmoothingQuality = 'high';
+
+        context.save();
+        // Geser poros ke tengah canvas lanskap
+        context.translate(targetWidth / 2, targetHeight / 2);
+
+        if (isPortrait) {
+            // Jika video aslinya potrait (karena HP berdiri), putar -90 derajat agar jadi lanskap
+            context.rotate(-90 * Math.PI / 180);
+            if (useFrontCamera) {
+                context.scale(-1, 1); // Penyesuaian efek cermin
+            }
+            context.drawImage(video, -targetHeight / 2, -targetWidth / 2, targetHeight, targetWidth);
+        } else {
+            if (useFrontCamera) {
+                context.scale(-1, 1);
+            }
+            context.drawImage(video, -targetWidth / 2, -targetHeight / 2, targetWidth, targetHeight);
+        }
+        context.restore(); 
         
-        // --- DRAW FINAL WATERMARK DI FOTO (Kanan Bawah) ---
+        // --- PROSES MENGGAMBAR WATERMARK PADA HASIL LANSKAP ---
         const timestampText = updateLiveWatermark(); 
-        const fontSize = 28;
+        // Ukuran font dibuat dinamis mengikuti besarnya resolusi kamera
+        const fontSize = Math.max(24, Math.floor(targetHeight * 0.035));
         context.font = `500 ${fontSize}px 'Inter', sans-serif`;
         const textWidth = context.measureText(timestampText).width;
         
@@ -408,21 +416,22 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
         const boxHeight = fontSize + paddingY * 2;
         const boxWidth = textWidth + paddingX * 2;
         
-        // Hasil akhir foto diset normal (Landscape) dengan WM di pojok kanan bawah
-        const marginBottom = 25;
-        const marginRight = 25;
-        const boxX = targetWidth - boxWidth - marginRight;
+        // Karena canvas sudah diputar menjadi lanskap,
+        // Watermark yang tadinya di "kiri" kini posisinya berada di "Bawah Tengah"
+        const marginBottom = 40;
+        const boxX = (targetWidth - boxWidth) / 2;
         const boxY = targetHeight - boxHeight - marginBottom;
 
-        // Gambar Box
+        // Kotak background watermark
         context.fillStyle = "rgba(15, 23, 42, 0.75)"; 
         drawRoundedRect(context, boxX, boxY, boxWidth, boxHeight, 10);
         context.fill();
 
-        // Gambar Teks Putih
+        // Teks watermark
         context.fillStyle = "#ffffff"; 
         context.textBaseline = "middle";
-        context.fillText(timestampText, boxX + paddingX, boxY + (boxHeight / 2) + 2); 
+        context.textAlign = "center";
+        context.fillText(timestampText, boxX + boxWidth / 2, boxY + boxHeight / 2 + 2); 
         
         capturedImage = canvas.toDataURL('image/jpeg', 0.92); 
         preview.src = capturedImage; 
