@@ -39,7 +39,7 @@ body { background-color: var(--bg); color: var(--text-main); line-height: 1.5; d
 .container { width: 100%; max-width: 680px; background: var(--bg); position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.05); margin: 20px 10px; min-height: 100vh; }
 
 @supports (padding-top: env(safe-area-inset-top)) {
-  .container { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .container, .camera-popup { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 }
 
 @media screen and (min-width: 768px) { .view-section{ border-radius: var(--radius-xl); } }
@@ -81,7 +81,7 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 #photo-preview { width: 100%; height: 100%; object-fit: cover; display: none; cursor: zoom-in; }
 
 /* ========================================= */
-/* UI KAMERA FULLSCREEN (POSISI ABSOLUT)   */
+/* UI KAMERA FULLSCREEN (POP-UP) ABSOLUTE    */
 /* ========================================= */
 .camera-popup {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -89,52 +89,76 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 }
 .camera-popup.active { display: block; }
 
-#camera-feed { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+/* Container Video */
+.video-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2001; overflow: hidden; }
+#camera-feed { width: 100%; height: 100%; object-fit: cover; }
 #camera-feed.mirrored { transform: scaleX(-1); }
 
-/* Tombol Lingkaran Kecil */
-.icon-btn { background: rgba(255,255,255,0.15); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+/* Overlay UI di atas Video */
+.camera-ui {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 2010; pointer-events: none; /* Klik tembus ke belakang */
+}
+/* Kembalikan fungsi klik khusus untuk tombol */
+.camera-ui button { pointer-events: auto; }
+
+/* 1. Tombol Capture: Bawah & Tengah Horizontal */
+.btn-capture {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px; height: 72px; background: white; border-radius: 50%; 
+    border: 5px solid rgba(255,255,255,0.3); cursor: pointer; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; padding: 0;
+}
+.btn-capture:active { transform: translateX(-50%) scale(0.9); background: #e2e8f0; border-color: rgba(255,255,255,0.5); }
+
+/* 2. Watermark Live: Kiri Layar, Rotasi -90deg, Text-Align Right */
+#live-watermark {
+    position: absolute;
+    left: 55px; /* Jarak dari kiri fisik layar */
+    top: 50%;   /* Mulai dari tengah vertikal */
+    
+    /* Putar -90 derajat (atas huruf menghadap kanan) dan dorong elemen 
+       sepanjang sumbu barunya agar benar-benar berada di tengah */
+    transform-origin: top left;
+    transform: rotate(-270deg) translateX(-50%);
+    
+    width: 370px; /* Lebar box teks */
+    text-align: right; /* Meratakan teks ke "kanan" (berarti ke atas fisik layar) */
+    
+    background: rgba(15, 23, 42, 0.75);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+
+/* Base style untuk tombol icon kecil */
+.icon-btn {
+    background: rgba(255,255,255,0.15); border: none; width: 46px; height: 46px; 
+    border-radius: 50%; color: white; display: flex; align-items: center; 
+    justify-content: center; backdrop-filter: blur(4px); padding: 0; cursor: pointer;
+}
 .icon-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
 
-/* Tombol Capture (Bulat Besar) */
-.btn-capture { width: 72px; height: 72px; background: white; border-radius: 50%; border: 5px solid rgba(255,255,255,0.3); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.2s; padding: 0; }
-.btn-capture:active { transform: scale(0.9); background: #e2e8f0; border-color: rgba(255,255,255,0.5); }
-
-
-/* POSISI ELEMEN KAMERA (SESUAI REQUEST) */
-
-/* 1. Tombol Close: Kiri Atas */
-#btn-close-camera { position: absolute; top: 30px; left: 30px; z-index: 2010; }
-
-/* 2. Tombol Ganti Kamera: Kanan Atas */
-#btn-switch-camera { position: absolute; top: 30px; right: 30px; z-index: 2010; }
-
-/* 3. Tombol Capture: Kanan Tengah (Vertikal) */
-#btn-capture-camera { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); z-index: 2010; }
-
-/* 4. Watermark: Pojok Kanan Bawah */
-#live-watermark {
-    position: absolute; bottom: 30px; right: 30px;
-    background: rgba(15, 23, 42, 0.75); color: white; padding: 8px 16px; border-radius: 8px;
-    font-size: 14px; font-weight: 500; z-index: 2015; pointer-events: none;
-    font-family: 'Inter', sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,0.5); white-space: nowrap;
-    transition: transform 0.3s ease;
+/* 3. Tombol Ganti Kamera: Kanan Bawah */
+.btn-switch {
+    position: absolute;
+    bottom: 45px;
+    right: 25px;
 }
 
-/* Penyesuaian Watermark jika HP posisi Tegak (Potrait) */
-@media screen and (orientation: portrait) {
-    #live-watermark {
-        transform: rotate(-90deg);
-        transform-origin: right bottom;
-        right: 40px; /* Geser sedikit agar rotasi rapi */
-    }
-}
-
-/* Mengakali SafeArea iPhone/PWA */
-@supports (padding-top: env(safe-area-inset-top)) {
-    #btn-close-camera, #btn-switch-camera { top: calc(30px + env(safe-area-inset-top)); }
-    #live-watermark { bottom: calc(30px + env(safe-area-inset-bottom)); }
-    #btn-capture-camera { right: calc(30px + env(safe-area-inset-right)); }
+/* 4. Tombol Close: Kanan Atas */
+.btn-close {
+    position: absolute;
+    top: 35px;
+    right: 25px;
 }
 /* ========================================= */
 
@@ -246,22 +270,26 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
 
 <div id="camera-popup" class="camera-popup">
     
-    <video id="camera-feed" autoplay playsinline></video>
+    <div class="video-container">
+        <video id="camera-feed" autoplay playsinline></video>
+    </div>
 
-    <button class="icon-btn" id="btn-close-camera" onclick="closeCameraPopup()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-    </button>
-
-    <button class="icon-btn" id="btn-switch-camera" onclick="toggleCamera()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-    </button>
-
-    <button class="btn-capture" id="btn-capture-camera" onclick="takePhoto()" title="Ambil Foto"></button>
-
-    <div id="live-watermark">KPU JOMBANG | ...</div>
-    
+    <div class="camera-ui">
+        
+        <div id="live-watermark">KPU JOMBANG | ...</div>
+        
+        <button class="icon-btn btn-close" onclick="closeCameraPopup()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <button class="icon-btn btn-switch" onclick="toggleCamera()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        </button>
+        
+        <button class="btn-capture" onclick="takePhoto()" title="Ambil Foto"></button>
+        
+    </div>
 </div>
-
 <div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt="Foto Diperbesar" onclick="event.stopPropagation(); closeLightbox();"></div>
 
 <script>
@@ -273,7 +301,6 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
     let capturedImage = null;
     let liveWatermarkInterval = null; 
 
-    // --- FUNGSI WATERMARK LIVE ---
     function updateLiveWatermark() {
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -357,7 +384,7 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
         const videoAspectRatio = videoWidth / videoHeight; const targetAspectRatio = targetWidth / targetHeight;
         let sourceX, sourceY, sourceWidth, sourceHeight;
 
-        // Logika crop pintar: output foto selalu landscape 16:9 berapapun rotasi HP-nya
+        // Logika center crop agar hasil foto selalu Landscape 16:9
         if (videoAspectRatio > targetAspectRatio) {
             sourceHeight = videoHeight; sourceWidth = videoHeight * targetAspectRatio;
             sourceX = (videoWidth - sourceWidth) / 2; sourceY = 0;
@@ -371,7 +398,7 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
         context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
         if (useFrontCamera) context.setTransform(1, 0, 0, 1, 0, 0); 
         
-        // --- GAMBAR WATERMARK DI KANAN BAWAH ---
+        // --- DRAW FINAL WATERMARK DI FOTO (Kanan Bawah) ---
         const timestampText = updateLiveWatermark(); 
         const fontSize = 28;
         context.font = `500 ${fontSize}px 'Inter', sans-serif`;
@@ -381,13 +408,13 @@ button { padding: 16px; border: none; border-radius: var(--radius-md); font-weig
         const boxHeight = fontSize + paddingY * 2;
         const boxWidth = textWidth + paddingX * 2;
         
+        // Hasil akhir foto diset normal (Landscape) dengan WM di pojok kanan bawah
         const marginBottom = 25;
         const marginRight = 25;
-        // Penyesuaian agar Box ada di POJOK KANAN BAWAH
         const boxX = targetWidth - boxWidth - marginRight;
         const boxY = targetHeight - boxHeight - marginBottom;
 
-        // Gambar Box Gelap
+        // Gambar Box
         context.fillStyle = "rgba(15, 23, 42, 0.75)"; 
         drawRoundedRect(context, boxX, boxY, boxWidth, boxHeight, 10);
         context.fill();
