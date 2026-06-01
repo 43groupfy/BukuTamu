@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Buku Tamu Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Buku Tamu Digital KPU</title>
     
     <!-- TAG PWA -->
     <link rel="manifest" href="manifest.json">
@@ -12,355 +12,433 @@
     <link rel="icon" type="image/x-icon" href="icon.svg">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px 15px;
-        }
-        .view-section {
-            display: none;
-            background: var(--surface);
-            padding: 25px 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .view-section.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        .btn-back {
-            background: transparent;
-            color: var(--text-light);
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 0;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-back:hover { color: var(--primary); }
-        .form-group { margin-bottom: 15px; }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        input[type="text"], input[type="date"], select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: var(--bg);
-            font-family: inherit;
-        }
-        .camera-container {
-            position: relative;
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-            margin-bottom: 10px;
-        }
-        #camera-feed {
-            width: 100%;
-            display: block;
-            object-fit: cover; 
-        }
-        .mirrored { transform: scaleX(-1); }
-        .camera-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-        button {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            width: 100%;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-        }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-secondary { background: var(--bg); border: 1px solid var(--border); color: var(--text); width: 100%; }
-        #photo-preview {
-            width: 100%;
-            border-radius: 8px;
-            display: none;
-            margin-bottom: 15px;
-            cursor: zoom-in;
-            border: 2px solid var(--border);
-        }
-        .filter-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-        }
-        .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; display: none; }
-        .date-grid label { font-size: 0.8rem; color: var(--text-light); }
-        .guest-card {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            background: var(--surface);
-        }
-        .guest-photo {
-            width: 65px;
-            height: 65px;
-            border-radius: 8px;
-            object-fit: cover;
-            cursor: zoom-in;
-            border: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-        .guest-info { flex: 1; min-width: 0; }
-        .guest-info h4 { margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .inst-text { font-weight: 400; font-size: 0.85rem; color: var(--text-light); }
-        .guest-info p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .badge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-        .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 99px; background: #fef3c7; color: #d97706; font-weight: 600; }
-        .status-badge.pulang { background: #d1fae5; color: #059669; }
-        .btn-pulang { background: var(--success); color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 6px; }
-        .lightbox {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px;
-        }
-        .lightbox.active { display: flex; animation: fadeIn 0.2s ease-in-out; }
-        .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); cursor: zoom-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+:root {
+    --primary: #4F46E5; 
+    --primary-hover: #4338CA;
+    --primary-ring: rgba(79, 70, 229, 0.25);
+    --bg: #F8FAFC; 
+    --surface: #FFFFFF;
+    --text-main: #0F172A; 
+    --text-muted: #64748B; 
+    --border: #E2E8F0;
+    --success: #10B981;
+    --success-bg: #D1FAE5;
+    --warning: #F59E0B;
+    --warning-bg: #FEF3C7;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+body { background-color: var(--bg); color: var(--text-main); line-height: 1.5; display: flex; justify-content: center; overflow-x: hidden; }
+
+.container { width: 100%; max-width: 680px; background: var(--bg); position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.05); margin: 20px 10px; min-height: 100vh; }
+
+@supports (padding-top: env(safe-area-inset-top)) {
+  .container, .camera-popup { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+}
+
+@media screen and (min-width: 768px) { .view-section{ border-radius: var(--radius-xl); } }
+@media screen and (max-width: 768px) { 
+    body{ background: var(--surface); }
+    .container { width: 100%; height: auto; margin: 0; position: relative; display: flex; flex-direction: column; }
+    .view-section { width: 100%; padding: 24px 20px 32px; }
+    #btn-submit{ margin-bottom: 40px; }
+}
+
+.view-section { display: none; background: var(--surface); padding: 24px 20px 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); height: auto; animation: slideFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.view-section.active { display: block; }
+
+@keyframes slideFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.button-group { display: flex; flex-direction: row; gap: 16px; }
+@media screen and (max-width: 768px) { .button-group { flex-direction: column; width: 100%; } }
+
+h1, h2, h3 { color: var(--text-main); letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; font-family: 'Poppins', sans-serif; text-align: center; width: 100%; padding-bottom: 10px; border-bottom: 2px solid #333; }
+
+.btn-back { background: var(--surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 99px; font-weight: 600; font-size: 0.9rem; cursor: pointer; padding: 8px 16px; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s; }
+.btn-back:active { transform: scale(0.95); background: var(--bg); }
+
+.form-group { margin-bottom: 20px; }
+label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
+input[type="text"], input[type="date"], select { width: 100%; padding: 16px; border: 1px solid transparent; border-radius: var(--radius-md); font-size: 1rem; background: #F1F5F9; color: var(--text-main); transition: all 0.2s ease; }
+input::placeholder { color: #94A3B8; }
+input:focus, select:focus { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-ring); outline: none; }
+
+button { padding: 16px; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); }
+.btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2); }
+.btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #E2E8F0; color: var(--text-main); }
+.btn-secondary:active { background: #cbd5e1; }
+
+.photo-placeholder { width: 100%; aspect-ratio: 16/9; background: #F1F5F9; border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-bottom: 16px; overflow: hidden; }
+#photo-preview { width: 100%; height: 100%; object-fit: cover; display: none; cursor: zoom-in; }
+
+/* ========================================= */
+/* UI KAMERA FULLSCREEN (POP-UP) MODER     */
+/* ========================================= */
+.camera-popup {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 2000; flex-direction: column; color: white;
+}
+.camera-popup.active { display: flex; }
+
+/* Default Header & Footer (Untuk fallback) */
+.camera-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2010; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+.camera-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 20px 40px; display: flex; justify-content: center; align-items: center; z-index: 2010; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
+
+/* --- PERUBAHAN: LAYOUT LANSKAP NATIVE KETIKA HP DIPUTAR --- */
+@media screen and (orientation: landscape) {
+    .camera-footer {
+        /* Pindah ke kanan */
+        top: 0; right: 0; bottom: 0; left: auto;
+        width: 120px; height: 100%; padding: 0;
+        flex-direction: column;
+        background: linear-gradient(to left, rgba(0,0,0,0.5), transparent);
+    }
+    .camera-header {
+        /* Tetap di atas tapi lebih pendek */
+        height: 80px; padding: 15px 30px;
+    }
+}
+
+.icon-btn { background: rgba(255,255,255,0.15); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 0; }
+.icon-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+
+.video-container { flex: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+#camera-feed { width: 100%; height: 100%; object-fit: cover; }
+#camera-feed.mirrored { transform: scaleX(-1); }
+
+/* --- PERUBAHAN: WATERMARK LIVE DI KIRI BAWAH --- */
+#live-watermark {
+    position: absolute;
+    bottom: 25px;
+    left: 25px; /* Kiri, agar aman dari tombol capture di kanan */
+    background: rgba(15, 23, 42, 0.75);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 2015;
+    pointer-events: none; /* Klik tembus */
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    white-space: nowrap;
+}
+
+.btn-capture { width: 72px; height: 72px; background: white; border-radius: 50%; border: 5px solid rgba(255,255,255,0.3); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.2s; padding: 0; }
+.btn-capture:active { transform: scale(0.9); background: #e2e8f0; border-color: rgba(255,255,255,0.5); }
+
+/* Overlay Paksa Lanskap */
+#landscape-notif { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 3000; color: white; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; backdrop-filter: blur(5px); }
+@media screen and (max-width: 950px) and (orientation: portrait) { body.camera-active #landscape-notif { display: flex; } }
+
+.phone-icon { font-size: 4rem; margin-bottom: 20px; animation: rotatePhone 2s infinite ease-in-out; }
+@keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+
+/* Cards & Lists */
+.filter-card { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; display: none; }
+.guest-card { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; display: flex; gap: 16px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); transition: transform 0.2s; }
+.guest-photo { width: 80px; aspect-ratio: 16/9; border-radius: var(--radius-md); object-fit: cover; cursor: zoom-in; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; }
+.guest-info { flex: 1; min-width: 0; }
+.guest-info h4 { margin: 0; font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inst-text { font-weight: 500; font-size: 0.85rem; color: var(--text-muted); }
+.guest-info p { margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge-container { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.status-badge { font-size: 0.75rem; padding: 6px 12px; border-radius: 99px; background: var(--warning-bg); color: #B45309; font-weight: 600; letter-spacing: 0.02em; }
+.status-badge.pulang { background: var(--success-bg); color: #047857; }
+.btn-pulang { background: var(--surface); color: var(--text-main); border: 1px solid var(--border); padding: 6px 14px; font-size: 0.8rem; border-radius: 99px; width: auto; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.btn-pulang:active { background: var(--success); color: white; border-color: var(--success); }
+
+.lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
+.lightbox.active { display: flex; animation: fadeIn 0.2s ease-out; }
+.lightbox img { max-width: 100%; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); cursor: zoom-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
     </style>
 </head>
 <body>
 <div class="container">
     
     <!-- BERANDA -->
-    <div id="view-home" class="view-section active" style="text-align: center; padding: 40px 20px;">
-        <img src="logo-js.png" alt="Logo Buku Tamu" style="width: 50%; margin-bottom: 10px;">
-        <h1 style="color: var(--text); font-size: 1.8rem;">Buku Tamu Digital<h1>
-        <h2 style="margin-bottom: 5px; color: var(--text); font-size: 1.3rem;">KPU Kabupaten Jombang</h2>
-        <p style="color: var(--text-light); margin: 15px 0 10px; font-size: 0.9rem;">Pilih menu layanan di bawah ini</p>
-        <button class="btn-primary" style="padding: 18px; margin-bottom: 15px; font-size: 1.1rem;" onclick="navigate('tamu')">Isi Form Tamu</button>
-        <button class="btn-secondary" style="padding: 18px; font-size: 1.1rem;" onclick="navigate('js-kpu')">Buka Buku Tamu</button>
+    <div id="view-home" class="view-section active" style="text-align: center; padding-top: 40px;">
+        <img src="logo-js.png" alt="Logo Buku Tamu" style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+        <h1 style="color: var(--text-main); font-size: 1.8rem; font-weight: 800; font-family: 'Poppins', sans-serif;">Buku Tamu Digital<h1>
+        <h2 style="margin-bottom: 5px; color: var(--text-main); font-size: 1.3rem; border: none; font-weight: 600;">KPU Kabupaten Jombang</h2>
+        <p style="color: var(--text-muted); margin: 20px 0 30px; font-size: 0.95rem; max-width: 300px; margin-left: auto; margin-right: auto;">Selamat datang. Silakan pilih menu layanan di bawah ini.</p>
+        <div class="button-group">
+            <button class="btn-primary" style="padding: 20px; font-size: 1.1rem; border-radius: 16px;" onclick="navigate('tamu')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                Isi Form Tamu Baru
+            </button>
+            <button class="btn-secondary" style="padding: 20px; font-size: 1.1rem; border-radius: 16px;" onclick="navigate('js-kpu')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                Buka Daftar Tamu
+            </button>
+        </div>
     </div>
 
     <!-- FORM TAMU -->
     <div id="view-tamu" class="view-section">
-        <button class="btn-back" onclick="navigate('home')">⬅ Kembali ke Beranda</button>
-        <h2 style="margin-bottom: 20px;">Registrasi Tamu</h2>
-        
+        <button class="btn-back" onclick="navigate('home')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Kembali
+        </button>
+        <h2 style="margin-bottom: 25px;">Registrasi Tamu</h2>
+
         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="guest-name" placeholder="Masukkan nama..." required></div>
         <div class="form-group"><label>Asal Instansi</label><input type="text" id="guest-institution" placeholder="Contoh: Masyarakat Umum / PT. Maju Jalan ..." required></div>
         <div class="form-group"><label>Tujuan / Keperluan</label><input type="text" id="guest-purpose" placeholder="Bertemu siapa / untuk apa..." required></div>
         
         <div class="form-group">
-            <label>Foto Wajah</label>
-            <div class="camera-container"><video id="camera-feed" autoplay playsinline></video></div>
+            <label>Foto Wajah (Wajib Lanskap)</label>
+            <div class="photo-placeholder" id="photo-area">
+                <div id="empty-photo-icon" style="text-align: center;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    <p style="font-size: 0.85rem;">Foto belum diambil</p>
+                </div>
+                <img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
+            </div>
             <canvas id="canvas" style="display: none;"></canvas>
-            <img id="photo-preview" alt="Hasil Foto" onclick="openLightbox(this.src)">
-            
-            <!-- Kontrol Saat Kamera Aktif -->
-            <div class="camera-controls" id="camera-controls">
-                <button class="btn-secondary" style="flex: 1;" onclick="toggleCamera()">Ganti Kamera</button>
-                <button class="btn-primary" style="flex: 2;" onclick="takePhoto()">Ambil Foto</button>
-            </div>
-            
-            <!-- Kontrol Saat Foto Sudah Diambil -->
-            <div id="retake-controls" style="display: none; margin-bottom: 15px;">
-                <button class="btn-secondary" style="width: 100%;" onclick="retakePhoto()">Ulang Foto</button>
-            </div>
+            <button type="button" class="btn-secondary" id="btn-activate-camera" onclick="openCameraPopup()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Ambil Foto / Ulang
+            </button>
         </div>
 
-        <!-- Tombol Submit Utama di Paling Bawah -->
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0 15px 0;">
-        <button id="btn-submit" class="btn-primary" style="padding: 16px; font-size: 1.05rem;" onclick="submitGuest()">Submit Data</button>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0 20px 0;">
+        <button id="btn-submit" class="btn-primary" style="padding: 18px; font-size: 1.1rem; border-radius: 14px;" onclick="submitGuest()">
+            🚀 Submit Data Kunjungan
+        </button>
     </div>
 
     <!-- SUKSES -->
-    <div id="view-success" class="view-section" style="text-align: center; padding: 50px 20px;">
-        <div style="font-size: 5rem; margin-bottom: 15px;">✅</div>
-        <h2 style="color: var(--text); margin-bottom: 10px;">Pengisian Berhasil!</h2>
-        <p style="color: var(--text-light); margin-bottom: 35px; line-height: 1.6;">Data kunjungan Anda beserta foto telah aman tersimpan di dalam sistem. Terima kasih.</p>
-        <button class="btn-secondary" style="padding: 15px;" onclick="navigate('home')">Tutup & Kembali</button>
+    <div id="view-success" class="view-section" style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 5rem; margin-bottom: 20px; animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">✅</div>
+        <h2 style="color: var(--text-main); margin-bottom: 15px; border: none;">Pengisian Berhasil!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 40px; line-height: 1.7; max-width: 320px; margin-left: auto; margin-right: auto;">Data kunjungan Anda beserta foto ber-watermark telah aman tersimpan di dalam sistem. Terima kasih.</p>
+        <button class="btn-secondary" style="padding: 16px; border-radius: 12px;" onclick="navigate('home')">Tutup & Kembali</button>
     </div>
 
     <!-- DASHBOARD JS KPU -->
     <div id="view-js-kpu" class="view-section">
-        <button class="btn-back" onclick="navigate('home')">⬅ Kembali ke Beranda</button>
-        <h2 style="margin-bottom: 15px;">Daftar Tamu</h2>
+        <button class="btn-back" onclick="navigate('home')">
+             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Kembali
+        </button>
+        <h2 style="margin-bottom: 15px;">Daftar Tamu KPU</h2>
         <div class="filter-card">
             <select id="time-filter" onchange="handleFilterChange()">
-                <option value="today">Hari Ini</option>
+                <option value="today" selected>Hari Ini</option>
                 <option value="week">7 Hari Terakhir</option>
-                <option value="all" selected>Semua Waktu</option>
+                <option value="all">Semua Waktu</option>
                 <option value="custom">Periode Tertentu...</option>
             </select>
             <div id="custom-date-grid" class="date-grid">
                 <div><label>Dari Tanggal</label><input type="date" id="start-date"></div>
                 <div><label>Sampai Tanggal</label><input type="date" id="end-date"></div>
-                <button class="btn-primary" style="grid-column: span 2; margin-top: 5px; padding: 10px;" onclick="applyFilter()">Cari Data</button>
+                <button class="btn-primary" style="grid-column: span 2; margin-top: 5px; padding: 12px;" onclick="applyFilter()">Cari Data</button>
             </div>
         </div>
         <div id="guest-list"></div>
     </div>
 </div>
 
+<!-- ========================================= */
+        POP-UP KAMERA FULLSCREEN HTML
+<!-- ========================================= */ -->
+<div id="camera-popup" class="camera-popup">
+    <!-- Header (Atas) -->
+    <div class="camera-header">
+        <button class="icon-btn" onclick="closeCameraPopup()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h3 style="font-size: 1rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Ambil Foto</h3>
+        <button class="icon-btn" onclick="toggleCamera()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        </button>
+    </div>
+
+    <!-- Area Video (Tengah) & WATERMARK LIVE -->
+    <div class="video-container">
+        <video id="camera-feed" autoplay playsinline></video>
+        <div id="live-watermark">KPU JOMBANG | ...</div>
+    </div>
+
+    <!-- Footer (Kanan saat Lanskap, Bawah saat Potrait) -->
+    <div class="camera-footer">
+        <button class="btn-capture" onclick="takePhoto()" title="Ambil Foto"></button>
+    </div>
+</div>
+
+<!-- Overlay Peringatan Rotasi HP -->
+<div id="landscape-notif">
+    <div class="phone-icon">🔄📱</div>
+    <h2 style="color: white; border: none; margin-bottom: 10px;">MOHON PUTAR HP ANDA</h2>
+    <p style="opacity: 0.8; font-size: 0.9rem; line-height: 1.5;">Sistem mewajibkan foto dalam mode <br><strong>Lanskap (Tiduran)</strong> agar seragam.</p>
+</div>
+
 <div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt="Foto Diperbesar" onclick="event.stopPropagation(); closeLightbox();"></div>
 
 <script>
-    // MASUKKAN URL WEB APP ANDA DI SINI
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwoMvb2dpFWmfrkYDxSiK85Vc5p3-SD245ADjcGTW5atXe6WBgPK4kuh_2hxcq5zA1/exec';
     
     let guests = [];
     let currentStream = null;
     let useFrontCamera = true;
     let capturedImage = null;
+    let liveWatermarkInterval = null; // Variabel untuk loop watermark
+
+    // --- FUNGSI WATERMARK LIVE ---
+    function updateLiveWatermark() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const text = "KPU JOMBANG | " + now.toLocaleDateString('id-ID', options).replace(/\./g, ':');
+        const watermarkEl = document.getElementById('live-watermark');
+        if(watermarkEl) watermarkEl.innerText = text;
+        return text; // Return text agar foto yang ditangkap memakai detik yang persis sama
+    }
+
+    function startLiveWatermark() {
+        updateLiveWatermark(); // Eksekusi langsung
+        liveWatermarkInterval = setInterval(updateLiveWatermark, 1000); // Ulang tiap 1 detik
+    }
+
+    function stopLiveWatermark() {
+        if (liveWatermarkInterval) {
+            clearInterval(liveWatermarkInterval);
+            liveWatermarkInterval = null;
+        }
+    }
+
 
     function navigate(viewId) {
         if (viewId === 'js-kpu') {
-            const pin = prompt("Masukkan PIN Akses:");
+            const pin = prompt("Masukkan PIN Akses Dashboard:");
             if (pin !== "3517") { alert("PIN Salah! Akses ditolak."); return; }
         }
         document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
         document.getElementById(`view-${viewId}`).classList.add('active');
         
-        if (viewId === 'tamu') {
-            startCamera();
-        } else if (viewId === 'js-kpu') { 
-            stopCamera(); 
-            document.getElementById('time-filter').value = 'all'; 
+        if (viewId === 'js-kpu') { 
+            closeCameraPopup(); 
+            document.getElementById('time-filter').value = 'today'; 
             loadDataFromDatabase(); 
-        } else if (viewId === 'home' || viewId === 'success') {
-            stopCamera();
+        } else {
+            closeCameraPopup(); 
         }
     }
 
-    function handleFilterChange() {
-        const filterType = document.getElementById('time-filter').value;
-        const customGrid = document.getElementById('custom-date-grid');
-        if (filterType === 'custom') customGrid.style.display = 'grid'; 
-        else { customGrid.style.display = 'none'; applyFilter(); }
+    async function openCameraPopup() {
+        const popup = document.getElementById('camera-popup');
+        popup.classList.add('active');
+        document.body.classList.add('camera-active');
+        startLiveWatermark(); // Mulai Watermark
+        await startCamera();
     }
 
-    function applyFilter() {
-        const filterType = document.getElementById('time-filter').value;
-        const now = new Date();
-        let filteredGuests = guests;
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        if (filterType === 'today') filteredGuests = guests.filter(g => g.id >= todayStart);
-        else if (filterType === 'week') filteredGuests = guests.filter(g => g.id >= todayStart - (6 * 24 * 60 * 60 * 1000));
-        else if (filterType === 'custom') {
-            const startInput = document.getElementById('start-date').value;
-            const endInput = document.getElementById('end-date').value;
-            if (!startInput || !endInput) return alert("Pilih tanggal mulai dan akhir!");
-            const startDate = new Date(startInput).setHours(0,0,0,0);
-            const endDate = new Date(endInput).setHours(23,59,59,999);
-            filteredGuests = guests.filter(g => g.id >= startDate && g.id <= endDate);
-        }
-        renderGuestList(filteredGuests);
+    function closeCameraPopup() {
+        const popup = document.getElementById('camera-popup');
+        popup.classList.remove('active');
+        document.body.classList.remove('camera-active');
+        stopLiveWatermark(); // Matikan Watermark
+        stopCamera();
     }
-
-    function openLightbox(imgSrc) {
-        const lightbox = document.getElementById('lightbox');
-        document.getElementById('lightbox-img').src = imgSrc;
-        lightbox.classList.add('active');
-    }
-
-    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
 
     async function startCamera() {
-        if (currentStream) currentStream.getTracks().forEach(track => track.stop());
-        const constraints = { video: { facingMode: useFrontCamera ? "user" : "environment", width: { ideal: 1280 }, height: { ideal: 720 } } };
+        if (currentStream) stopCamera();
+        const constraints = { video: { facingMode: useFrontCamera ? "user" : "environment", width: { ideal: 1280 }, height: { ideal: 720 }, aspectRatio: 1.777777778 } };
         try {
             currentStream = await navigator.mediaDevices.getUserMedia(constraints);
             const video = document.getElementById('camera-feed');
             video.srcObject = currentStream;
             if (useFrontCamera) video.classList.add('mirrored');
             else video.classList.remove('mirrored');
-        } catch (err) { alert("Gagal mengakses kamera. Pastikan browser diizinkan mengakses kamera."); }
+        } catch (err) { alert("Gagal mengakses kamera. Pastikan browser diizinkan."); closeCameraPopup(); }
     }
 
-    function stopCamera() { if (currentStream) currentStream.getTracks().forEach(track => track.stop()); }
+    function stopCamera() { if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); currentStream = null; } }
     function toggleCamera() { useFrontCamera = !useFrontCamera; startCamera(); }
 
     function takePhoto() {
         const video = document.getElementById('camera-feed');
         const canvas = document.getElementById('canvas');
         const preview = document.getElementById('photo-preview');
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        const context = canvas.getContext('2d');
+        const placeholderIcon = document.getElementById('empty-photo-icon');
         
-        if (useFrontCamera) { context.translate(canvas.width, 0); context.scale(-1, 1); }
+        const isPotrait = window.innerHeight > window.innerWidth;
+        if (isPotrait && window.innerWidth < 950) { alert("Mohon putar HP Anda ke posisi Lanskap."); return; }
+
+        const context = canvas.getContext('2d');
+        const targetWidth = 1280; const targetHeight = 720;
+        canvas.width = targetWidth; canvas.height = targetHeight;
+
+        const videoWidth = video.videoWidth; const videoHeight = video.videoHeight;
+        const videoAspectRatio = videoWidth / videoHeight; const targetAspectRatio = targetWidth / targetHeight;
+        let sourceX, sourceY, sourceWidth, sourceHeight;
+
+        if (videoAspectRatio > targetAspectRatio) {
+            sourceHeight = videoHeight; sourceWidth = videoHeight * targetAspectRatio;
+            sourceX = (videoWidth - sourceWidth) / 2; sourceY = 0;
+        } else {
+            sourceWidth = videoWidth; sourceHeight = videoWidth / targetAspectRatio;
+            sourceX = 0; sourceY = (videoHeight - sourceHeight) / 2;
+        }
+
         context.imageSmoothingEnabled = true; context.imageSmoothingQuality = 'high';
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (useFrontCamera) { context.translate(targetWidth, 0); context.scale(-1, 1); }
+        context.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
         if (useFrontCamera) context.setTransform(1, 0, 0, 1, 0, 0); 
         
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        const timestampText = now.toLocaleDateString('id-ID', options).replace(/\./g, ':');
-        context.font = "500 24px Inter, sans-serif";
+        // --- GAMBAR WATERMARK DI KIRI BAWAH ---
+        // Ambil string teks detik terakhir dari live watermark
+        const timestampText = updateLiveWatermark(); 
+        const fontSize = 28;
+        context.font = `500 ${fontSize}px 'Inter', sans-serif`;
         const textWidth = context.measureText(timestampText).width;
-        const padX = 18, padY = 12, boxH = 46;
-        const startX = canvas.width - textWidth - (padX * 2) - 20; 
-        const startY = canvas.height - boxH - 20; 
-        context.fillStyle = "rgba(15, 23, 42, 0.7)"; 
-        context.beginPath(); context.roundRect(startX, startY, textWidth + (padX * 2), boxH, 8); context.fill();
-        context.fillStyle = "#ffffff"; context.textBaseline = "middle"; context.fillText(timestampText, startX + padX, startY + (boxH / 2));
         
-        capturedImage = canvas.toDataURL('image/jpeg', 0.95); 
+        const paddingX = 20; const paddingY = 15;
+        const boxHeight = fontSize + paddingY * 2;
+        const boxWidth = textWidth + paddingX * 2;
+        
+        // Posisi di Pojok KIRI Bawah (Margin 25px dari kiri dan bawah)
+        const marginBottom = 25;
+        const marginLeft = 25;
+        const boxX = marginLeft;
+        const boxY = targetHeight - boxHeight - marginBottom;
+
+        // Gambar Box Gelap
+        context.fillStyle = "rgba(15, 23, 42, 0.75)"; 
+        drawRoundedRect(context, boxX, boxY, boxWidth, boxHeight, 10);
+        context.fill();
+
+        // Gambar Teks Putih
+        context.fillStyle = "#ffffff"; 
+        context.textBaseline = "middle";
+        context.fillText(timestampText, boxX + paddingX, boxY + (boxHeight / 2) + 2); 
+        
+        capturedImage = canvas.toDataURL('image/jpeg', 0.92); 
         preview.src = capturedImage; 
         preview.style.display = 'block'; 
-        video.style.display = 'none'; 
-        
-        // Transisi Tombol Kamera
-        document.getElementById('camera-controls').style.display = 'none';
-        document.getElementById('retake-controls').style.display = 'block';
+        placeholderIcon.style.display = 'none'; 
+        closeCameraPopup();
     }
 
-    function retakePhoto() {
-        capturedImage = null; 
-        document.getElementById('photo-preview').style.display = 'none';
-        document.getElementById('retake-controls').style.display = 'none';
-        
-        document.getElementById('camera-feed').style.display = 'block';
-        document.getElementById('camera-controls').style.display = 'flex';
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius); ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height); ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius); ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y); ctx.closePath();
     }
 
     async function submitGuest() {
@@ -369,76 +447,76 @@
         const purpose = document.getElementById('guest-purpose').value;
         const submitBtn = document.getElementById('btn-submit');
 
-        if (!name || !inst || !purpose || !capturedImage) {
-            return alert("Mohon lengkapi semua data dan ambil foto sebelum melakukan Submit!");
-        }
+        if (!name || !inst || !purpose || !capturedImage) return alert("MOHON LENGKAPI:\nNama, Instansi, Tujuan, dan Ambil Foto wajah sebelum Submit.");
 
         const newGuest = { action: 'addGuest', id: Date.now(), name: name, institution: inst, purpose: purpose, photo: capturedImage };
-        submitBtn.innerText = "⏳ Sedang Submit..."; 
-        submitBtn.disabled = true; 
-        submitBtn.style.opacity = '0.7';
+        submitBtn.innerText = "⏳ Sedang Menyimpan Data..."; submitBtn.disabled = true; submitBtn.style.opacity = '0.7';
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST', body: JSON.stringify(newGuest), headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
-            });
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(newGuest), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
             const result = await response.json();
-            
             if (result.status === 'success') {
-                // Reset Form
-                document.getElementById('guest-name').value = ''; 
-                document.getElementById('guest-institution').value = '';
-                document.getElementById('guest-purpose').value = ''; 
-                capturedImage = null;
-                document.getElementById('photo-preview').style.display = 'none'; 
-                document.getElementById('camera-feed').style.display = 'block';
-                
-                // Reset Tombol Kamera
-                document.getElementById('retake-controls').style.display = 'none';
-                document.getElementById('camera-controls').style.display = 'flex';
-                
+                document.getElementById('guest-name').value = ''; document.getElementById('guest-institution').value = '';
+                document.getElementById('guest-purpose').value = ''; capturedImage = null;
+                document.getElementById('photo-preview').style.display = 'none'; document.getElementById('empty-photo-icon').style.display = 'flex';
                 navigate('success');
-            } else {
-                alert("Gagal menyimpan data: " + result.message);
-            }
-        } catch (e) { 
-            alert("Terjadi kesalahan koneksi server. Pastikan internet menyala."); 
-        } finally { 
-            submitBtn.innerText = "🚀 Submit Data"; 
-            submitBtn.disabled = false; 
-            submitBtn.style.opacity = '1'; 
-        }
+            } else { alert("Gagal menyimpan data ke Server: " + result.message); }
+        } catch (e) { alert("Terjadi kesalahan koneksi server atau CORS. Pastikan internet stabil."); } 
+        finally { submitBtn.innerText = "🚀 Submit Data Kunjungan"; submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
     }
 
     async function loadDataFromDatabase() {
         const container = document.getElementById('guest-list');
-        container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:20px;">⏳ Memuat data tamu...</p>';
+        container.innerHTML = '<div style="text-align:center; color:#64748b; margin-top:30px; font-size:0.9rem;"><div class="phone-icon" style="animation:none; font-size:2rem;">⏳</div>Memuat data tamu...</div>';
         try {
             const response = await fetch(SCRIPT_URL + '?action=getData');
+            if(!response.ok) throw new Error("Network error");
             guests = await response.json(); handleFilterChange(); 
-        } catch (e) { container.innerHTML = '<p style="text-align:center; color:#ef4444; margin-top:20px;">Koneksi gagal. Cek internet Anda.</p>'; }
+        } catch (e) { container.innerHTML = '<p style="text-align:center; color:#ef4444; margin-top:30px; background:#fee2e2; padding:15px; border-radius:10px; font-size:0.9rem;">🛑 Gagal memuat data.</p>'; }
+    }
+
+    function handleFilterChange() {
+        const filterType = document.getElementById('time-filter').value;
+        const customGrid = document.getElementById('custom-date-grid');
+        if (filterType === 'custom') { customGrid.style.display = 'grid'; } else { customGrid.style.display = 'none'; applyFilter(); }
+    }
+
+    function applyFilter() {
+        const filterType = document.getElementById('time-filter').value;
+        const now = new Date(); let filteredGuests = guests;
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        
+        if (filterType === 'today') filteredGuests = guests.filter(g => g.id >= todayStart);
+        else if (filterType === 'week') filteredGuests = guests.filter(g => g.id >= todayStart - (7 * 24 * 60 * 60 * 1000));
+        else if (filterType === 'custom') {
+            const startInput = document.getElementById('start-date').value; const endInput = document.getElementById('end-date').value;
+            if (!startInput || !endInput) return alert("Pilih tanggal mulai dan tanggal akhir!");
+            const startDate = new Date(startInput).setHours(0,0,0,0); const endDate = new Date(endInput).setHours(23,59,59,999);
+            filteredGuests = guests.filter(g => g.id >= startDate && g.id <= endDate);
+        }
+        renderGuestList(filteredGuests);
     }
 
     function renderGuestList(dataToRender = guests) {
-        const container = document.getElementById('guest-list');
-        container.innerHTML = '';
-        if (dataToRender.length === 0) return container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:20px;">Tidak ada data tamu di periode ini.</p>';
-        
+        const container = document.getElementById('guest-list'); container.innerHTML = '';
+        if (!dataToRender || dataToRender.length === 0) return container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:40px; font-size:0.9rem; background:#F1F5F9; padding:20px; border-radius:12px;">📭 Tidak ada data tamu.</p>';
         const sortedGuests = [...dataToRender].sort((a, b) => b.id - a.id);
+        
         sortedGuests.forEach(guest => {
             const card = document.createElement('div'); card.className = 'guest-card';
-            const isPulang = guest.status === 'Pulang';
-            const badgeClass = isPulang ? 'status-badge pulang' : 'status-badge';
-            const instDisplay = guest.institution ? guest.institution : '-';
+            const isPulang = guest.status === 'Pulang'; const badgeClass = isPulang ? 'status-badge pulang' : 'status-badge';
+            const dateInStr = new Date(guest.id).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'});
+            const timeInStr = new Date(guest.id).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+
             card.innerHTML = `
-                <img src="${guest.photo}" class="guest-photo" alt="Foto" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/65x65?text=No+Img'">
+                <img src="${guest.photo}" class="guest-photo" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/160x90?text=No+Img'">
                 <div class="guest-info">
-                    <h4>${guest.name} <span class="inst-text">(${instDisplay})</span></h4>
+                    <h4>${guest.name} <span class="inst-text">(${guest.institution || '-'})</span></h4>
                     <p>${guest.purpose}</p>
-                    <p style="font-size: 0.75rem; color: var(--primary); margin-top:4px;">🕒 ${guest.timeIn}</p>
+                    <p style="font-size: 0.75rem; color: var(--primary); margin-top:5px; font-weight:500;">📅 ${dateInStr} | 🕒 ${timeInStr} WIB</p>
                     <div class="badge-container">
-                        <span class="${badgeClass}">${guest.status}</span>
-                        ${!isPulang ? `<button class="btn-pulang" onclick="markAsPulang(${guest.id}, this)">Pulang</button>` : ''}
+                        <span class="${badgeClass}">${guest.status || 'Hadir'}</span>
+                        ${!isPulang ? `<button class="btn-pulang" onclick="markAsPulang(${guest.id}, this)">Set Pulang</button>` : `<span style="font-size:0.7rem; color:var(--text-muted);">Jam: ${guest.timeOut || '-'}</span>`}
                     </div>
                 </div>
             `;
@@ -447,27 +525,23 @@
     }
 
     async function markAsPulang(id, btnElement) {
-        if(confirm("Tandai tamu ini sudah meninggalkan area?")) {
+        if(confirm("Tandai tamu sudah pulang?")) {
             btnElement.innerText = "⏳..."; btnElement.disabled = true;
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST', body: JSON.stringify({ action: 'markPulang', id: id }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'markPulang', id: id }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const result = await response.json();
-                if(result.status === 'success') loadDataFromDatabase();
-            } catch (e) { alert("Gagal mengubah status."); btnElement.innerText = "Pulang"; btnElement.disabled = false; }
+                if(result.status === 'success') loadDataFromDatabase(); else throw new Error(result.message);
+            } catch (e) { alert("Gagal mengubah status: " + e.message); btnElement.innerText = "Set Pulang"; btnElement.disabled = false; }
         }
     }
 
-    window.onload = function() { navigate('home'); };
+    function openLightbox(imgSrc) { document.getElementById('lightbox-img').src = imgSrc; document.getElementById('lightbox').classList.add('active'); }
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker terdaftar!', reg))
-          .catch(err => console.log('Service Worker gagal:', err));
-      });
-    }
+    window.onload = function() { 
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Failed', err));
+        navigate('home'); 
+    };
 </script>
 </body>
 </html>
